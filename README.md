@@ -1,3 +1,3 @@
 # Youtube-Spotify-Downloader
 ITS SHITY, Garbage, but it works soo yeah.....
-Downloads music, soo it would be acceptable put into custom albums. (This is for Samsung Music)
+Downloads music, soo it would be put into custom albums. (This is for Samsung Music)
