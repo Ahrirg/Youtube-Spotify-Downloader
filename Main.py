@@ -8,7 +8,7 @@ from mutagen.easyid3 import EasyID3
 
 import customtkinter as CT 
 
-version = "3.0.1 dev"
+version = "3.1.0 pre-release"
 
 settings = {
     'Language': 'EN',
@@ -52,7 +52,7 @@ def SpotifySideDownload(List):
     print('Starting Spotify download')
     DownloadOptions = {
         "threads": int(settings['Threads']),
-        "output":  CMDpath + "/{artists} - {title}.{output-ext}",
+        "output": CMDpath + "/{artists} - {title}.{output-ext}",
         "max_retries": 5,
     }
     Sdl = Spotdl(client_id=settings['Client_id_spotify'], client_secret=settings['Client_secret_spotify'], downloader_settings=DownloadOptions, no_cache=True) #Threads=int(settings['Threads'])
@@ -62,7 +62,7 @@ def SpotifySideDownload(List):
         Putbackthismusic.append(f'{x.artist} - {x.name}.mp3')
         
     Sdl.download_songs(song_objs)
-    # MoveMp3Files(CMDpath, PathofCode + f"/{CurrentDownloading['Name']}", f"{CurrentDownloading['Name']}")
+    
     print("Spotify download has finished")
 
 def YoutubeSideDownload(List):
@@ -78,6 +78,7 @@ def YoutubeSideDownload(List):
             'preferredcodec': 'mp3',
             'preferredquality': '192',
         }],
+
     }
 
     with yt_dlp.YoutubeDL(ytdlp_opts) as ytdl:
@@ -96,8 +97,8 @@ def ExtractYoutube(link):
 
     json_object = json.dumps(playlist_dict, indent=4)
 
-    # with open(f"test.json", "w") as outfile:
-    #     outfile.write(json_object)
+    with open(f"test.json", "w") as outfile:
+        outfile.write(json_object)
 
     for x in playlist_dict['entries']:
         urls.append(x['url'])
@@ -118,24 +119,9 @@ def MoveMp3Files(OldFolderPATH, NewFolderPATH, AlbumName):
     except Exception as err:
         print(f"ERROR WAS : {err}")
 
-
-
 inputQuary = ["https://www.youtube.com/watch?v=QalWKRmjHJA", "https://www.youtube.com/watch?v=i8wghCdMncU", "https://www.youtube.com/watch?v=3MjBlSnX51M", "https://www.youtube.com/watch?v=tm7Xf9818FM", "https://www.youtube.com/watch?v=RQmEERvqq70"]
 
-
-# print(f'Filtered songs//\nYoutube: {YoutubeSongs}\nSpotify: {SpotifySongs}\nNameSongs: {NameSongs}')
-
-# try:
-#     SpotifySideDownload(SpotifySongs)
-# except Exception as err:
-#     print(f"ERROR WAS : {err}")
-
 Putbackthismusic = []
-# for x in Putbackthismusic:
-#     try: 
-#         shutil.move(f"{CMDpath}/{x}", f"{CMDpath}/{x}")
-#     except:
-#         print('Buvo error no wories tho')
 
 async def Worker(i):
     await asyncio.gather(
@@ -153,23 +139,6 @@ async def Master(Queue):
             else:
                 for x in range(len(Queue)):
                     tg.create_task(Worker(Queue.pop(0))),
-
-def ProgressBarRun():
-    z=1
-    # app = Progress()
-    # app.mainloop()
-
-# async def Combine(Songs, Which):
-#     if Which != "Spotify":
-#         async with asyncio.TaskGroup() as tg:
-#             tg.create_task(Master(Songs)),
-#             tg.create_task(asyncio.to_thread(ProgressBarRun)),
-#     else:
-#         await asyncio.gather(
-#             asyncio.to_thread(SpotifySideDownload, Songs)
-#         )
-            
-
 
 class Navigbar(CT.CTkFrame):
     def __init__(self, master, **kwargs):
@@ -269,8 +238,12 @@ class Frame1RightSide(CT.CTkFrame):
         self.pad = CT.CTkLabel(master=self, text="")
         self.pad.pack(pady=20, padx=450)
 
-        self.button = CT.CTkButton(self, text="Save", command=self.master.master.SaveAlbum, width=150, height=50)
+        self.button = CT.CTkButton(self, text="Save", command=self.savefile, width=150, height=50)
         self.button.pack(padx=20, pady=20, anchor="e")
+
+    def savefile(self):
+        self.master.master.SaveAlbum()
+        self.button.configure(text="Sucessfully Saved!", fg_color= "#78c396", hover_color="#78c396")
 
 class Frame1(CT.CTkFrame):
     def __init__(self, master, **kwargs):
@@ -371,8 +344,9 @@ class FrontEnd(CT.CTk):
     def __init__(self):
         super().__init__()
 
+        self.title("Darg Music Downloader")
         self.geometry("900x700")
-        CT.set_appearance_mode("system")
+        CT.set_appearance_mode("dark")
 
         self.Navigbar = Navigbar(master=self)
         self.Navigbar.pack(pady=10)
@@ -397,6 +371,7 @@ class FrontEnd(CT.CTk):
         self.button3 = CT.CTkButton(self, text="Save", command=self.SaveSettings, width=300, height=75)
         self.button3.pack(padx=20, pady=20)
 
+
     def DEL(self):
         lists = self.pack_slaves()
         for x in lists:
@@ -410,8 +385,10 @@ class FrontEnd(CT.CTk):
             settings['Client_id_spotify'] = self.Frame3.Entry3.get()
         if self.Frame3.Entry4.get() != '':
             settings['Client_secret_spotify'] = self.Frame3.Entry4.get()
+        
 
         SaveJson(settings, 'setting.json')
+        self.button3.configure(text="Sucessfully Saved!", fg_color= "#78c396", hover_color="#78c396")
 
     def SaveAlbum(self):
         JsonList = {
@@ -435,7 +412,7 @@ class Progress(CT.CTk):
     def __init__(self):
         super().__init__()
 
-        CT.set_appearance_mode("system")
+        CT.set_appearance_mode("dark")
         self.geometry("900x300")
 
         self.pad = CT.CTkLabel(master=self, text='')
@@ -460,7 +437,7 @@ class Finished(CT.CTk):
     def __init__(self):
         super().__init__()
 
-        CT.set_appearance_mode("system")
+        CT.set_appearance_mode("dark")
         self.geometry("900x300")
 
         self.Label = CT.CTkLabel(master=self, text='FINISHED')
@@ -475,7 +452,10 @@ if __name__ == "__main__":
     settings = LoadJson('setting.json')
 
     app = FrontEnd()
-    app.mainloop()
+    try:
+        app.mainloop()
+    except:
+        print("Exited mainloop")
 
     if willDownload:
         SpotifySongs = []
@@ -524,4 +504,7 @@ if __name__ == "__main__":
         MoveMp3Files(CMDpath, CMDpath + f"/{CurrentDownloading['Name']}", f"{CurrentDownloading['Name']}")
 
         app = Finished()
-        app.mainloop()
+        try:
+            app.mainloop()
+        except:
+            print("Exited mainloop")
